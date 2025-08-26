@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão Escolar</title>
+    <title>Gestão de Alunos - Sistema Escolar</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -15,13 +15,13 @@
             <h2>Gestão Escolar</h2>
         </div>
         <ul class="nav-links">
-            <li class="active">
+            <li>
                 <a href="index.html">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li>
+            <li class="active">
                 <a href="alunos.html">
                     <i class="fas fa-user-graduate"></i>
                     <span>Alunos</span>
@@ -52,51 +52,48 @@
         <header class="top-bar">
             <div class="search-container">
                 <i class="fas fa-search"></i>
-                <input type="search" placeholder="Pesquisar..." aria-label="Campo de pesquisa">
+                <input type="search" id="searchAlunos" placeholder="Buscar alunos..." aria-label="Buscar alunos">
             </div>
-            <div class="user-menu">
-                <span class="user-name">Administrador</span>
-                <img src="user-avatar.png" alt="Avatar do usuário" class="avatar">
-            </div>
+            <button class="btn-primary" onclick="openModal('modalNovoAluno')">
+                <i class="fas fa-plus"></i> Novo Aluno
+            </button>
         </header>
 
-        <div class="dashboard">
-            <div class="cards-container">
-                <div class="card">
-                    <div class="card-icon students">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-                    <div class="card-info">
-                        <h3>Total de Alunos</h3>
-                        <p class="number">250</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon classes">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="card-info">
-                        <h3>Turmas Ativas</h3>
-                        <p class="number">12</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon teachers">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                    <div class="card-info">
-                        <h3>Professores</h3>
-                        <p class="number">32</p>
-                    </div>
-                </div>
+        <div class="filters">
+            <div class="filter-group">
+                <label for="filterTurma">Turma</label>
+                <select id="filterTurma">
+                    <option value="">Todas</option>
+                    <option value="1A">1º Ano A</option>
+                    <option value="1B">1º Ano B</option>
+                    <option value="2A">2º Ano A</option>
+                </select>
             </div>
+            <div class="filter-group">
+                <label for="filterStatus">Status</label>
+                <select id="filterStatus">
+                    <option value="">Todos</option>
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+            </div>
+        </div>
 
-            <div class="recent-activities">
-                <h2>Atividades Recentes</h2>
-                <div class="activities-list">
-                    <!-- Lista de atividades será preenchida via JavaScript -->
-                </div>
-            </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Matrícula</th>
+                        <th>Turma</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="alunosTableBody">
+                    <!-- Dados serão inseridos via JavaScript -->
+                </tbody>
+            </table>
         </div>
     </main>
 
@@ -105,9 +102,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Novo Aluno</h2>
-                <button class="close-modal">&times;</button>
+                <button class="close-modal" onclick="closeModal('modalNovoAluno')">&times;</button>
             </div>
-            <form id="formNovoAluno">
+            <form id="formNovoAluno" onsubmit="submitNovoAluno(event)">
                 <div class="form-group">
                     <label for="nome">Nome Completo</label>
                     <input type="text" id="nome" name="nome" required>
@@ -122,6 +119,24 @@
                         <input type="text" id="cpf" name="cpf" required>
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="turma">Turma</label>
+                        <select id="turma" name="turma" required>
+                            <option value="">Selecione uma turma</option>
+                            <option value="1A">1º Ano A</option>
+                            <option value="1B">1º Ano B</option>
+                            <option value="2A">2º Ano A</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status" required>
+                            <option value="ativo">Ativo</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="email">E-mail</label>
                     <input type="email" id="email" name="email" required>
@@ -130,8 +145,12 @@
                     <label for="telefone">Telefone</label>
                     <input type="tel" id="telefone" name="telefone" required>
                 </div>
+                <div class="form-group">
+                    <label for="endereco">Endereço</label>
+                    <input type="text" id="endereco" name="endereco" required>
+                </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalNovoAluno')">Cancelar</button>
                     <button type="submit" class="btn-primary">Salvar</button>
                 </div>
             </form>
